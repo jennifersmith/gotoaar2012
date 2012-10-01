@@ -1,0 +1,140 @@
+* Challenges of connected data
+
+1970s the glory years - nylon was in.
+
+EF Codd bring bunch of discrete maths from lab to the real world. 
+
+Want to model the world and query it. 
+
+"Data Scientist" - someone that understands stats to 6th form level.
+
+Codd worked for 'proper' IBM. Invested in fundamental math sci physics
+research.
+
+Invested in bringing Codd's model work predicates, sets into R
+database. Took to market and created a whole new product. We all have
+benefited from RDs.
+
+1970s wasn't entirely homogeneous, but generally a 'monocrhome, square
+kind of era'. we all fit the model.
+
+Turns out we all fit into tables cos we were square.
+
+We will come back to Margaret Thatcher.
+
+Relational Databases Inc. got lucky. aka oracle. Copied/took
+inspiration from IBM and disrupted market with their product
+oracle. Back in day were disruptive influence. Relational became _the_
+database in the eighties. 
+
+ORM and EJBs the 'vietnam' of computer science.
+
+90s : data was rectangular.
+
+Tim Berners-Lee was not thinking soley about square and rectangular
+data. How to I share data and cross reference it? Scientist thinkinh
+about sharing results. He invents the web...
+
+Not square data now... squiggly data.
+
+Google Scale.
+
+Some organisations that worked with data noticed they were processing
+differently shaped data and were not getting a lot of benefits from
+relational. So they started building their own databases. Google have
+big table etc. ...
+
+Facebook. 
+
+Left outer inner downy upper joins.
+
+We are not getting a lot of value for some, increasing amount of our
+data.
+
+Relational is mature. Transactions are safe. But running into
+difficulties with the model. Not a fault of the relational
+stores. Sets dont scale any more.
+
+NoSQL. Four broad categories. 
+
+Key value, epitomised by riak. No linkage. They are separate items.
+
+Column stores. Cassandra, HBase etc. Scalable. 
+
+Document stores. "MongoDB is web scale". Metaphore is nice. Like a
+filing cabinet we can put arbitrary documents into.
+
+Aggregate stores. Emphasis on map/reduce... processing data not
+'submit the data'. Process vs query model.
+
+complexity = f(size, connectedness, uniformity)
+
+Data is becoming more connected.
+
+We are interested in the gaps in the data.
+
+London Underground is just a graph.
+
+What do I want to get out of graph databases. Hegemony.
+
+Modelling in graphs is super simple.
+
+Doctor Who. 
+
+1 to 2 million traversals per second. 
+
+ACID transaction database... so you must stick it in a transaction.
+
+Relationships must always be directed and names.
+
+NoSQL databases are for the developer.... we have thought of them that
+way.
+
+Neo4j has query language called cipher - makes transactional stuff
+simpler.
+
+I love neo4j but use for graph problems. Riak for shopping cart
+
+Blood is in the water: "Use my database for everything"
+
+But that is the world we just left.
+
+Can store linked data in aggregate database and reify in application
+out of flat disconeccted.
+
+But why bother - if you are deealing with graphs why not store as a
+graph. 
+
+But - what if you try and push that aggregate store further. I am
+going to use it for everything.
+
+But if you add new data to it, you have to start precomputing and
+adding things non-live.  Graph traversal quicker .
+
+Can look for your pattern in a graph "People like you bought
+this". Aggregate pattern matching.
+
+** Graph matching
+
+Super powerful to look for patterns in a data set. Retail analytics,
+realtime upselling.
+
+Graph is full of patterns. "Find me stuff that looks like this".
+
+ascii art queries.
+
+(Doctor) <-[:played]-(actor)
+
+Get a couple of starting points and find me that pattern. And also
+filter WHERE clause.
+
+Everyone is doing graphs nowadays. At beginning felt like noone knew
+or cared. But now adobe creative clouds, thingdom. 
+
+Cisco for netowrk fault analysis... "A and B are having problems, what
+having in common". Phyiscal network is a network!
+
+Parting shot. Try graphs, you going to like them. You can do awesome
+stuff with them.
+
+

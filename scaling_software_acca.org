@@ -1,0 +1,24 @@
+* Scaling software with Akka
+
+** Managing system overload
+
+** Scale up and scale out
+
+Written using scala but had to provide scala and java APIs.
+
+Wrappers for groovy, scala etc.
+
+Wanted one way of both scaling out and scaling up.
+
+Scaling up: improving hardware scaling on same box. Scaling out: more
+hardware.
+
+Up/out shoudl just be a deployment decision. So you should be able to
+design software free of worrying about this
+
+** How?
+
+Using actors.
+
+Akka is more than just actors. Actors one tool in the tool box.
+
