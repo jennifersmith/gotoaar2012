@@ -22,3 +22,234 @@ Using actors.
 
 Akka is more than just actors. Actors one tool in the tool box.
 
+** What s an actor?
+
+Unit of code organisation
+
+Actors separate policity decisions from biz log
+
+New to java but are tried and true concept used for 9 nines uptime in
+telecoms
+
+*** Programming at a higher level
+
+Never have to think about shared state, threads and other crap.
+
+Instead of dealing with lowlevel plumbing, you just start to think in
+terms of workflow. How my messages flow through the system.
+
+If you design in terms of workflow, you dont worry about threads and
+stuff, low level operating system concerns, deadlocks.
+
+Detecting and recovering from errors. Proven model? 
+
+*** Distributiable by design
+
+Same components can be used for scaling up and out.
+
+Location transparent - it doesnt matter where you run it.
+
+Perfect 'fabric' for the cloud - elastic and dynamic system.
+
+Actors can come and go, just like nodes can come and go. System can
+heal itself.
+
+Added other highlevel concepts like LB and routing
+
+** Companies that use Akka
+
+Amazon, BBC etc etc. 
+
+They need heavy SLAs.
+
+** What can I use actors for?
+
+Can think of it as a thread, but it's a bit of a bad comparison. OK
+conceptually.
+
+Callbak or listener
+
+singleton....
+
+takes a while to wrap head around it
+
+** What is the actor model?
+
+Carl Hewitt's definition.
+
+Fundamental unit of comp that embodies processing, storage (state,
+stuff on the heap), communication
+
+3 axioms.
+
+When message sent to actor:
++ create new actors
++ send messages to actors it knows
++ Change it's own behaviour... turns itself to something else for the
+  next message
+
+** Creating an actor
+
+***  0. Define
+
+Typed or untyped actors.
+
+Extend UntypedActor, implement onReceive.
+
+Better in scala cos of pattern matching.
+
+*** 1. Create
+
+Create instance. 
+
+Extremely lightweight - you cant think of it in terms of a thread.
+
+State and behaviour like reg object, but also a message queue - called
+a 'mail box'.
+
+system.actorOf() creates it but the actual actor could be on another
+machine 
+
+The decoupling is good even if it looks odd.
+
+*** Actors form hierarchies
+
+The top level is the "Guardian System Actor" - when you create an
+actor you create as child of that to start with. - can create a child
+actor of another actor.
+
+Can end up with actor hierarhcy
+
+Actors have paths /Foo/bar/a/  (actor a child of actor bar child of
+actor foo)
+
+Paths can be traversssed (../bar/*).
+
+*** 2. Send
+
+Send messages to actors.
+
+Asynchronous and non blocking - fire and forget.
+
+Dispatching is asynch and lockless
+
+Everything is reactive. 
+
+Actors could be buffered up but wont do anything unless it is
+troggered by a messaged.
+
+actor.tell (new Greeting ("hello"));
+
+Returns immediately after putting message on the mailbox.
+
+Actors run on N shared threadpools
+
+Runs  it in process by default.
+
+*** Remote deployment
+
+Json like format config to declare a node should be remote =
+ActorRefProvider.
+
+remote = akka://MySystem@machine1:2552
+
+Zero code changes to make it a remote
+
+*** 3. BECOME 
+
+?
+Dynamically redefines actors behaviour
+
+reactively triggered by receiving a message.
+
+In a type system analogy its like changed its type
+
+**** Why would you do that?
+
+Let a highly contended actor adaptively transform into an actor pool
+or a router.
+
+The guy using the actor, it doesnt need to know it is now a pool
+
+then it can pop the stack 
+
+OR
+
+Use it for finite state machines
+
+Start => Running => Suspend => Resume FSM example
+
+??? It seems quite a confusing thing to visualise compared to a
+process diagram/ procedural thing.
+
+You are forced by the model to be threadsafe.
+
+OR
+
+Implement graceful degradation
+
+Also has a dead letter queue.
+
+Spawn up empty generic wokers, the master can make them what it needs.
+
+Very useful once you get used to it.
+
+*** Become
+
+context.become - pass in anonymous class (no closures in java - be a
+lot more elegant)
+
+** Load balancing
+
+Turn an actor into a router.
+
+Can add a pool to a router. Router + Resizer. 
+
+Many different router implementations - including adaptive ones (least
+CPU etc)
+
+** Java 7 Concurrency.
+
+Using this to make stuff fly
+
+Fork/join
+
+Fork: recursiely decompose into subtasks
+
+JOin: await results of recurise tasks and combine.
+
+Great for divide and conquer style.
+
+Uses work stealing.
+
+*** Other uses
+
+Scala parallell collections
+Java parallel collctions??
+
+Akka uses too
+
+*** How does it use java 7 concurency
+
+*** Problems
+
+But only cos noone bothered to test it as they did
+
+** Failure recovery
+
+Failure in a single thread is broken. Single thread of control, if
+somethign blows up in threaad.
+
+Error recov and handling in that thread.
+
+Try catches all over rthe shop
+
+** JUST LET IT Crash
+
+Free from error handlling code.
+
+
+akka.io
+f
+
+

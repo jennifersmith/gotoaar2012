@@ -1,0 +1,223 @@
+* Making the JVM fly
+
+** Agenda
+
++ Memory management
++ Simple code tuning
++ Obvious mistakes
++ Simple is better
++ JVM memory
+
+** Problems
+
+
+typical problems: large amounts of data (Fix stock exchange messages,
+payments etc)
+
+Either lots of quad core machines but with a few weeks work can just
+go down to three machines running 20,000
+
+Performance isnt just about faster
+
+Latency is important. on NYSE, 1 millisecond = 100 million dollars. Why
+they machines are physically in the envrionment they work in.
+
+100ms = 1% of sales
+
+Not the cost of the software or the cost of machines, it's cost of
+running in production. Many biz charge 20,000 per year per
+machine. Environment, air cond etc.
+
+If you can reduce that then good.
+
+** Today's talk
+
++ No magic bullets!!
+
+But some informations so you can start tweaking it.
+
+** Java vs C/C++
+
+When training 15 years ago, made use of jni to call C for mandelbrot
+set
+
+in 2000 things had changed - was starting to NOT be faster to use
+jni. Cos java started to catch up. 
+
+Java becoming novelty language to animate gifs.... 
+
+** Data processing
+
+** Strings in pascal
+
+Pascal strings hae lenght of strings at first char.
+
+Testing str length wwas quick
+
+** String in c
+
+length calc is indetermiate till you reach the end \0
+
+** Passing by referene
+
+We started to move away and abstract ourselves from the machine
+
+Passing stuff by reference meant you didnt need to copy it.
+
+** Strings and collections
+
+If you put a string into a collection and delete the string, who owned
+that data? General Protection Fault - using free memory.
+
+If reader freed a string in cllection then writer had corrupt string.
+
+** Memory management
+
+Old days managed our own memory.
+More idiots could write code
+
+** Strings in Java
+
+String alphabet = "abcdef";
+for (){
+ alpha.substring(4,5); 
+}
+
+thousands of tiny obects
+
+** JVM will take caare of it
+
+GC and JIT are superb but wont cope with bad design or crap code.
+ 
+Think like a C programmer when you need to scale up etc.
+
+Your avg laptop can do 1billion fp operatios a second so 200 is a bit
+crap.
+
+People have forgotten low level mem management
+
+Searching in a string in jvm takes a two orders of mag longer. Need to
+look at the architecture.
+
+** Working with byte [] instead of string
+
+Previous can be rewritten on byte level (.getBytes()).
+
+alphabet.getSubString() creates a string alpahBytes[9] 
+
+When you are looking at architecture, look at some of the smaller
+parts and profile what you have got.
+
+** A side line
+
+Running tomcat and a jvm process with 4gb vm... 6gb on a virtua box
+with 4GB ... 
+
+So even though you have 4GB ... if you are in the swap space...
+
+** Too miuch memory
+
+It's easy to give the jvm a lot of memory
+
+But if it hits the limit you will get into swap
+
+** Overengineering
+
+20,000 messages a second for 24 hours. In memory db. Had to get lots
+of people in to tune the in memory database.
+
+** What's wrong with disk?
+
+Can write 500m per second - 1TB SSD costs $1000
+
+For a safestore maybe writing to disk better than in mem.
+
+Simplicity. If you want to get people to manage disk, easier to get
+people
+
+People overengineer
+
+** Understanding the JVM memory
+
+JVM has two sections of memory. Permgen and heap.... Perm is class
+space.
+
+** JVM heap
+
+Part of memory your app uses.
+
+Can set maximum and initial size.
+
+Try reducing the heap till you see a noticable difference.
+
+Dont just give it 4gb!
+
+Each time it grows, you get a pause as new memory is requested. 
+
+If you set both max and initial to the same, you will have it all
+allocated initially. Then you get more consistent results. Avoids
+pause while allocating.
+
+** Heap
+
+Heap is divided into sections -old and new. New has 'eden' and
+survival.
+
+eden -> survival space (2) -> old
+
+When Old gets full you get a GC. 
+
+Evenutally an OutOfMemoryException.
+
+Probably only other parameter yous should experinment with. There is a
+default value.
+
+Will make quite a significant difference to performance - less GCing?
+
+useful JVM opts diagram in slide.
+
+Create lots of objects? Maybe more young neaded.
+
+** New vs Old
+
++ Understand how your app uses memory is key
+
++ Creating lots of objecst, have more young gc
+
+** Useful tools
+
++ Assume now you got the perfect architecture, optimised and taken out
+  your ORM and your app perfect.
+
+NOW you can get into the jvm options
+
+jstat
+
+jvisualvm
+
+then lots of options... verbosegc etc.
+
+These are things which give you a lot of information about how GC is
+working. which will in turm show you how the jvm being used.
+
+
+Often a suprise how many objects you are creating. Why so many?
+
+* Close
+
+If you need more oomph
+
++ Look first at the arch and env
+
++ Then the code
+
++ Finally the JVM - it will show you how bad your code is - when you absoluately
+
+No transactions???!
+
+ORM kills machines!
+
+
+
+
+
