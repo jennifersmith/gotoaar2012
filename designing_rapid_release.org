@@ -1,0 +1,223 @@
+* Designing for rapid release
+
+** What criteria influence design?
+
+Constraints and principles. The ilities.
+
+Scaling. Compliance etc.
+
+* Making it easy to release
+
+Most of the time it seems to be an afterthought. 
+
+Takes a long time to release so didnt think of aspects of their system
+that make it easy to release.
+
+Make it quick to make a change
+Quick to deploy 
+Reduce risk
+
+Smaller parts mean easier to release
+
+Favours small incremental changes
+
+Each release allows you to roll back and gather data.
+
+More frequent process = practiced more often = better process
+
+** How do you allow these small incremental changes
+
+Shared libraries?
+
+Breaking down allows easier to reason about the system, fault
+localisation
+
+Also faster CI turnaround - just run that lib's test
+
+But there is a problem with deploying statically linked library.
+
+Still have to release the whole thing.
+
+If it is a service, you just change the link to it. Site can stay up
+during redeploy.
+
+Even do cool things like running them side by side - like smoke test,
+showcase.
+
+Couldnt do that if we were running a shared library.
+
+Blue green deployments.
+
+** What can stop blue/green deployments
+
+There might be constraints in your system that stop them from
+happening.
+
+For example user state on the server.... when switch to new site
+either have to kill state or move to new server.
+
+In general *avoid stateful services*
+
+** Expensive hardware
+
+"We can't afford another box to run your system in parallell"
+
+Not really an issue with external cloud provider.
+
+*** Manual circuit breaker
+
+put a circuit breaker between services.
+
+Degrading the quality of service. You need to think about this anyway
+in distributed systems.
+
+Do this during deploy and also do it during outage.
+
+If you have synchronous downstream servies you need to think about
+what to do if the service is not there.
+
+Release It! talks about this
+
+*** Alternatively make it asynchronous.
+
+Then the upstream service does not need to know .
+
+With an async not immediately obvious that it is down. Maybe not worth
+moving to this just to allow you to deploy.
+
+If you already persistent by nature, using persistent queues would
+allow you to resume
+
+Enterprise Integration Patterns
+
+** The Trifle
+
+Layering horizontally actually worse off - change ripples through the
+layers.
+
+When you slice horizontally over arbitrary tech boundaries, you will
+change far more often.
+
+"The Trifle" "The Battenburg" "The Spider"
+
+** The Spider
+
+One guy does all the orchestration.
+
+Four dumb systems and one giant thing in the middle.
+
+"Director"
+
+Ian R's definition of service "A set of capabilities on an endpoint"
+
+Capabilities e.g. Checkout, search, Listen to Previews
+
+These are things that everyone should understand.
+
+when you start identifying these capabilities you can start grouping
+them together.
+
+When you collected enough together they start becoming the boundaries
+to your service.
+
+CRC role playing exerfcise for services.
+
+Am I factoring correctly - if non tech can understand
+
+Model on your system's business domain capabilities (rather than
+entities)
+
+* Changing services
++ Internal change
++ Expansion
+
+Upstream services dont need to change.
+
++ Breaking interface changes : API changes 
+
+These increase size and risk of deployments.
+
+First way - dont do it!
+
+But if you cant do a non -breaking change
+
+Different endpoints - continue supporting them and gradually move off
+it
+
+Can also break stuff by having an entity in shared library -
+serialized/deserialised.
+
+Deploy new version of library with Service A, service B could be
+screwed.
+
+Shared library deployments might need to be synch.
+
+Be wary of shared serialisation protocols. WSDL-binding, JAXB, java
+serialization.
+
+RFC 761 - TCP/IP 
+
+Postel's law
+
+Binary serialization forces you to bind to the whole message. If need
+three fields in a big soap payload, dont bind to the whole thing.
+
+Best practice use XPATH.
+
+Copy/paste is better than accidentally getting into state where you
+cant deploy
+
+** Consumer driven contracts
+
+** Databases!!
+
+Talked about easy stuff so far. Not talked much about databases.
+
+Databases are inherently evil things. In context of easy to change.
+
+Distributed service antipattern: integration via the database!
+
+Cant change the schema for one service if another service is lookign
+at it.
+
+Need to treat db schema as a separate service with a huge API called
+sql.
+
+What we want is separate schemas.
+
+Typically this wont require any more hardware, just a sep schema.
+
++ Each service should own it own data.
+
+Free to make change to datastore underneath.
+
+*** Procedure for moving data store
+
++ Release 1 : Dual write to rdbms and riak
++ Release 2: read from riak but still write to rdbms
++ Release 3: stop writing to rdbms
+
+Can do this with services to.
+
+Can send to services but not look at ansswers - can show and compare
+
+*** Decompose your system
+
+*** Model your domain
+
+*** Get Interfaces Right
+
+*** Separate Deployment From Release 
+
+
+Used to think maintainability was all about code quality TDD etc.
+
+No point thinking about how easy to make that change if that doesnt
+include deploying in a production system.
+
+Movement away from large monolithic services to smaller services
+talkign to one another. More easy now we have cloud providers -
+smaller instances. A lot more experiences of how RPC is bad, rest is
+best.
+
+Key thing is to apply conscious thought.

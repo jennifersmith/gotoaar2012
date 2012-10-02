@@ -1,0 +1,114 @@
+* Eventual consistency in the real world
+
+or... why you already know eventual consistency
+
+or ... eventual consistency > eventual availability
+
+Riak lets you use a cluster as a databased, optimised for low latency
+availablity?
+
+Basho are 'distributed system experts'
+
+Brewer's Conjecture - cap theorem
+
+Comes down to choice between consistency and availability.
+
+CAP Theorem, 2002 Gilbert + Lynch MIT
+
+** Life is full of tradeoffs
+
+First people to recognise this commercially were amazon. Wanted to
+optmise for low latency and high availablity as it had a impact on
+their bottom line. Optmised for 95th percentile.
+
+Correlated latency to revenue.
+
+Realised that low latency was really important.
+
+Took all the information and learning into the Dynamo paper.
+
+"Eventual Consistency" coined in dynamo paper. (2007 Vogels paper
+title too)
+
+Came up with methodologies in dynamo paper that deal with it.
+
+Lots of people scared of eventual consistency but you should be scared
+about eventyuall availability.
+
+Eventual availability = spinning icon or bad gateway error.
+
+We are all used to seeing it in the real world, we should get used to
+eventual cons.
+
+How can you describe to your mother?
+
+Talks to financial organisations - they definitely dont like it. But
+really been dealing with it more than everyone else - think of
+reconcilliations etc.
+
+You dont go to HSBC headquarters to withdraw cash from there because
+they want to keep their account records. They have creaetd a
+centralised distributed system with branches and cashpoints. ATM is
+the edge of their network. Makes money easy available...
+
+If there is a break in network bank faced with a choice. Do I give him
+money now and figure it out later ? Or do I keep it consistent. Best
+UX is to make it available 
+
+** Eventual Consistency in Riak
+
+... we dont see it in databases like the real world.
+
+We should be.
+
+Riak has a ring topology as described in dynamo. But in erlang not
+java.
+
+Four physical nodes but creates abstract space of partitions.
+
+Can add/sub nodes  and read into several different partitions at once
+
+*** Read repair
+
+Database can be inconsistent
+
+??? Didnt understand this bit
+Read repairs?
+** Divergent object versions
+
+aka siblings - two changes made on clusters that are unaware of this.
+
+Riak optimised for write availability so we dont lose a write. We
+never lose data.
+
+Whole process of conflic resolution. This is the edge case.
+
+SEOMoz - we dont ever do conflict resolution by picking single
+simplings.
+
+Ruby gem ripple (code sample)
+
+For timestamps, often take then maximum sibling value or minimum
+depending on attr semantics.
+
+Or if they didnt have soemthing that fits auto res, find the one that
+is most recent.
+
+** Customer - Bump
+
+Stores comm between two users, but can be updated multiple times. 
+
+Updaates resolved as time sorted list...
+
+Or set union.
+
+** 
+The thing we need to do is encode world we live in. We deal with EC
+systems al the time. No one person has the correct view.
+
+Berkley link to explain why EC is good enough.
+
+** Qestions
+
+No guarentee that you will get read consistency even with single
+client. 
