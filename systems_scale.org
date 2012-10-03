@@ -1,0 +1,279 @@
+* What makes systems scale
+
+Martin Thompson
+
+Not just rows of boxes with things in them.
+
+How do you start with a small shop and turn it into biggest mall in
+europe.
+
+** What does it mean to be scalable
+
+Increase volume without having your costs go through the roof because
+that is not scaling.
+
+True scalability linear but from commercial POV then it's "OK" but you
+should be getting ecomonies of scale.
+
+Cost is so important.
+
+** Cost per transaction
+
+Fixed costs, variable costs. 
+
+Fixed costs: Deelopment effort, infrastrcture.
+
+Go with biz to know what volumn demand dealing wiht.
+
+If you dont know what tx you dealing with you might as well just
+guess.
+
+** How many TPS does an additional node provide?
+
+Most of the time nobody knows!
+
+You could just throw hardware at the problem but it's effecitvely like
+burning money.
+
+** Guidelines for scalable systems
+
+*** Domain model at core
+
+Pure model, no infrastructure. Clean and simple.
+
+Hexagonal Architectures - Alastair Cockburn
+
+Can get good clean code from taking this approach. Free from
+architectural concerns.
+
+Provide an adapter that persists it.
+
+"If someone says use an ORM you going to run away screaming" because
+if you mix things, you lose all your options.
+
+That way you can work and scale your sytsem.
+
+*** Performance test and profile
+
+How many people run a profiler once a week?
+
+Write your code, run your tests in a debugger. It's a great way to see
+stuff.
+
+Profiler allows you to see a much better picture of your system.
+
+WRITING PERF TESTS IS HARD
+
+More often than not, perf tests slowness in the tests.
+
+Test first! Start testing against a blank - returning true.
+
+Other mistakes - testing same customer, same entities. Not
+realistic. How you find realistic view?
+
+Ideally you take data from prod. Well at least talk to your business
+people.
+
+Theory of Constraints. Tempting to just fix the part of the system you
+are comfortable with.
+
+Always fix the first and the largest problem that comes up.
+
+Human behaviour is to fix the easy ones.
+
+Drives economics of dev.
+
+Big difference between 'premature optimisation' and not knowing
+characteristics of your system.
+
+Cost of adding another node to the system cost vs dev cost.
+
+*** Understand algorithm behaviour
+
+Test cases with set size of 1!
+
+Mistakes made by not knowing algo behaviour of their system.
+
+Ended up seeing hockystick performance.
+
+How can we improve TPS per node - a lot of it dealing with complexity
+of the algorithms.
+
+A lot of future as we go forward.
+
+Google: Cache Obvlivious Algorithms. How do we decompose problems in a
+memory friendly way.
+
+Unbounded queries - instead only bring back 100 rows.
+
+Bound the amount so you can deal with manageable amounts.
+
+*** Eliminate Contention
+
+Techniques to manamge scalability and contention are the bigest cause.
+
+Management toverheard (locks) often greater than the work you are
+doing
+
+COntention points - queues.
+
+Dont have the single LB/database everyonge goes to
+
+Lessons from disruptor: Problem set of LMAX it works really well but
+now used at other places without as much control of hardware.
+
+Cursor becomes point of contention.
+
+It's a lock free algo, not a wait free.
+
+Going to be releasing new queues that take out that contention point. 
+
+Two variables in the same cache line - contention point in the micro
+
+In the macro, shared databases.
+
+If you put a service way in front of that you remove a lot of
+contention. Caching, sharding.
+
+Load Balancers. SSL offload. We can be doing that on standard HW
+though. Also does connection multiplexing but TCP/IP stacks getting
+better all the time. But it's a point of contention.
+
+If you have a weird technology sitting on the side then it changes the
+way your team works.
+
+Really valid exercise to walk your architecture and check if you have
+single points of contention. Those hotspots really light up.
+
+*** Manage the queues
+
+Little's Law. If a process takes X on average, and if you had a queue
+infront of it with 10 items in it, the last item will take
+10X. Predictability.
+
+Queues are everywhere whether you know or not.
+
+"Not going to put a queue infront of it, going to put a lock". It's
+just a queue! 
+
+Make queues explicit.
+
+Locks, thread pools, writing reading from netowrk.
+
+Bring those queues out so you cna see them and manage them.
+
+First important thing, bound them!
+
+As you add stuff to a queue your queue gets bigger and it stops
+fitting in your cache. The thing that is picked out of queue is not
+cached so you get cache misses to add to your woes.
+
+Then you can honour a response time characteristic. Can work it out
+given little's law and the queue size.
+
+When the queue fails? Dont accept more units of work - ripples back to
+user.
+
+Better to deny input to users, rather than have them crash.
+
+Could be just a 503 back to the user.
+
+Can load test individual parts by throwing stuff into the queues.
+
+Fast feedback. Can add tracers, monitoring and sampling. 
+
+Problem seeing over and over. Curse of logging libraries. Amdahl's
+law.
+
+Most of common logging frameworks - perfect exercise in how to screw
+up system's design and how to disregard little's law and amdahl's law.
+
+Logging uncontended on a single thread takes 16 microseconds. All
+threads queuing up to log. If you are the unlucky thread that fails
+the buffer, everyone behind you suffer.
+
+Ditto with rolling.
+
+It's the perfect antipattern. Look inside logging frameworks and do
+the opposite and you will probably do better.
+
+18% of CPU time calling "isDebugEnabled"
+
+*** Seperate reading and writing
+
+One of best ways to releive contention. - reads normally greatly
+outnumber
+
+Event sourcing CQRS.
+
+Append only persistence.
+
+Doing updates in place is really hard.
+
+Datomic is a good example of this. Data is facts etc. 
+
+If you write append only you get much better throughput.
+
+Think in append only, immutable structures. Works incredibly well
+considering underlying hardware too. Disks can work a lot faster
+sequential rights. SSDs too. Completely random read access but
+overwrites/erases are slow - 2mb. Very qucik way to wear out an ssd.
+
+Caching is the way to get stuff quickly.
+
+Fact based caching... you can just do append only.
+
+Updates are expensive.
+
+Often Perfect != Right
+
+Dont need to keep the "100 rooms left" up to date on hotel
+booking. user can try it.
+
+*** Know your platform/infra
+
+Mechanical sympathy.
+
+"that hardware should handle 87000 per second, so 500 is a bit crap"
+
+Be aware of plaftorm capabilites.
+
+As a structural engineer, you would be fired if you didnt know tensile
+strenth of steel... not how to make it.
+
+Write performance tests for the infrastructure too.
+
+If you update a component or upgrade drive,r you know what has
+changed.
+
+Load test until the breaking point. How does it break? Nicest failure
+mode is not accepting any more load. Rather than falling off.
+
+Do it with your code, third party components. You will learn an awful
+lot. Your systems will get really solid.
+
+When you have failure scenarios, test your swap overs with the system
+at stress.
+
+Most errors hardwarae etc will happen under load
+
+*** Be commercial
+
+If you undesrtand biz, you understand demands of the biz. Get
+passionate about that and knowing about it.
+
+No is not a valid answer. "Yes we can do it, here is the
+consequences". That is an informed, respectful conversation. 
+
+Get the team to go for coffee with the business. Eat together.
+
+Informal structures look really well. Influence rather than
+authority. With the non-functional things noone really knows the right
+answer - you need to all work together.
+
+Have fun! Doing a lot of things like breaking the system is fun and
+lets them improve it. Let them talk about it. 
+
+
+
+

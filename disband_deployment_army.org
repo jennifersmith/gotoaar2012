@@ -1,0 +1,212 @@
+* Disband the deployment army
+
+Conference room photo with about forty people in it. In addition a
+conference call with as many people on it.
+
+Deployment began 4 in afternoon, will finish at 4am.
+
+Smoke testing by business users at 1am in morning! Scripts to click
+around.
+
+Some people report errors or click incorrectly cos it's not a good
+time of day.
+
+Steps in the plan for who to send out food.
+
+Steps in the plan for people to take out the trash.
+
+This is the deployment army.
+
+Antipattern
+
+** Army Deployments
+
+Self forfilling prophecy. Infrequent releases -> large -> risk ->
+Ambiguous situations forms the deployment army.
+
+High Cost of deployment. An army of 80 people is expensive.
+
+High cost makes it more infrequent - spirals.
+
+Reach a point where you cant add more people. Feels impossible to add
+more to process or to take thigns away.
+
+** Theory of constraints
+
+"evaporating cloud" - 
+
+achieving financial success for eg.  "Continuous integration all the
+way to production"
+
+But another branch of the cloud "We must avoid financial losses due to
+downtime, bugs, non compliance etc" - low risk, fewer deployments
+
+There is a conflict!
+
+We need to look at these assumptions of low risk and high risk
+
+** Understanding risk
+
+Most poeple's definition "Chance that something bad going to happen"
+
+Just a scare word "Risky scheme"
+
+Need more nuance :"Expected losses from undesirable events"
+
+*** Risk Exposure
+
+Annual Loss Expectancy (ALE) - used in actuarial and security
+
+Loss = NEvents * PError *CEvent
+
+Number of events times prob. error times cost per event.
+
+Having it in economic terms allows you to compare whether it's worth
+doing something.
+
+Tend to be bad at judghing this stuff without the data. We are loss
+advierese. Hold onto what we have got rather than takin the time.
+
+*** Exposure example: Bug in checkin
+
+Perror - occurrance 1 time in 10 to the 8, NEvents checkouts /year
+5.25 * 10 to 8 CEvent average 
+
+etc.
+
+you can see the cost so can compare and see if it worth fixing.
+
+** Categories of risk
+
++ Compliance risk
++ Tech risk
+
+Compliance risk tough to deal with.
+Could have a certification environment....
+
+** Technical risk
+
+What will more releases do to the equatioj> Nevents is more, fixed so
+need to reduce costs and sleep ir.
+
+
+** Continuous flow diag          
+
+** DONT DO FEATURE WOWK WHEN BUILD IS BROKE.
+
+** Deployment scripts
+
+Get operations invlved!
+
+DEPLOY FROM HEAD OF TRUNNK
+
+** Environment requirements
+
++ Packag repo
++ Logging
++ Metris 
+
+Use canary releases to detect wheehr cant'''
+
+
+** Make deloyments pracitcal and oriiw
+
+** Zero dowwnrimw deploy
+
+
+** Minimizing CEvent
+
+1. reduce mttd
+2. reduce mttr
+3. Reduce scope of impact
+
+   Low confidence with TDD but only tests at unit leevl.
+
+Unit tests inmprofe the confience but not by much
+
+So do user tests - but not as much as they could
+
+MONITORING is highest level
+
+Graphite will show you a problem before customers call.
+
+ETSY link "chart everything"
+
+The first time  you will get nasty services.
+
+Blend in external monitoring - probes to statsd?
+
+* Factors in Minimising MTTR
+
++ Determine the problem
++ Fix the problem
++ Deploy the fix
+
+* Scope of impact
+
+How many users are going to ssee the error? Split testing, Dark
+Launch, feature flags. Remote control mechanism.
+
+Dont want a bunch of admins have to ssh into a bunch of different
+boxes and make the change/administer.
+
+They will get it wrong, and it takes long time.
+
+Prefer to drop a message in the queue and have each machine read the
+message.
+
+How far can an error propogate?
+
+Decoupled architecture. 
+
+Bulkheads?>???
+
+Circuit breakers - prevent errors propogation between service provider
+and service consumer
+
+** "Doomed"
+
+Project that was a jar full of different jars deployed out to the
+servers in parallell
+
+Can make canary servers ... to start with
+
+Then decouple the archiceture.
+
+Could have any bug in account management  but dont lose the threads
+that respond to all the other features.
+
+Individual facilities could have their own canary pool.
+
+PHP developers get to brag - because so user focussed
+
+** Reducing risk exposure
+
+If we lower the probability of errors and the costs of errors we
+mitigate the effect of doing the release more oftem
+
+** Unsolved problems!
+
++ Library dependencies: If you using build tool that pulls in
+  libraries from other places. Caching... local rpms
+
++ Service and protocol dependencies... some of the answers are
+  there.
+
++ ITIL: nothing in defintition, it's just in the implementation.
+
+** Questions to think about.
+
+What could you do ?
+
+What is the smallest incremental change we could make toward CD?
+
+What could you automate that you havent?
+
+What could you od to remove org barriers that prevent you from doing
+CD? (It doesnt start by telling someone else they need to chnge)
+
+We should not support or allow this thing to happen any more.
+
+Waste of time, resources and humanity. Let these people get some sleep.
+

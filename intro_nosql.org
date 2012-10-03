@@ -1,0 +1,312 @@
+* History
+
+Rise of the relational database in the 1980s.
+
+Impedenace mismatch of mapping non tab data to tabs
+
+In mid 90s , thought object databases were gonna be the thing.
+
+Why didn't object databases fill that potential?
+
+SQL databases became an integration  mechanism. Made it hard for any
+other kind of tech to come in. 
+
+Relational continued dominance right into 2000s.
+
+** What changed?
+
+Rise of the internet - sites like google amazon that had lots of
+traffic.
+
+How do you scale? Buy bigger boxes? Costs a lot and limitations.
+
+Google use lots and lots of little boxes.
+
+SQL designed to run as a single box.
+
+It doesnt work too well with large clusters.
+
+"Unnatural acts" - spreading databases across clusters.
+
+So google amazon did something different : bigtable/dynamo. Published
+papers. inspired new move ment "NoSQL"
+
+** Where does term come from?
+
+Trying to define a movement by something it's not?
+
+Johan Oskarsson proposed a meetup. He needed a twitter
+hashtag!!! short and unique.
+
+All NoSQL was supposed to be is a #nosql hashtag!
+
+* Definition of NoSQL?
+
+Cannot define nosql databases but we can idnetify common
+characteristics.
+
+Non-relational, open source, cluster-friendly (was original
+requirement ), 21st century web, schema-less?
+
+21st century website culture - we dont call IMS or mumps nosql!
+
+* Datamodels
+
+Different to relational model.
+
+Document, graph, key-value, column
+
+** Key value
+
+Most simple - you have a key and you grab the value from it
+
+** Document datamodel
+
+Each document is a complex data structure. usually that is represented
+as json. As JSON is fashionable these days. You could do it in XML...
+
+Dont tend to have a set schema. RD only lets you put in data if it
+fits the schema.
+
+Basically you can shove in anything you like. 
+
+NoSQL people go on about the fact it is amazing, but not the entire
+truth. But your apps want certain attributes - so you have an implicit
+schema.
+
+Schemaless is a wussy term. "No fixed schema"
+
+The only time you dont need to worry about schema is when you want to
+say 'put all these values on the screen'
+
+** Key-value and document datastores
+
+The line between the is fuzzy.
+
+Can store metadata against KVs to build more complicated indexes. A
+bit like a document db?
+
+Document dbs, often you have an ID and you look stuff up - same as key
+in KV store.
+
+In reality dont worry about the differences, think of as 1st
+approximaton.
+
+They have a common notion that you have complex structure that you
+save into a single thing in db. Came up with term
+"aggregate-oriented". Where does term aggregate oriented from? DDD
+Eric Evans.
+
+We natually model things into aggregates.
+
+For e.g Order and LineItem. But we think of the Order as a whole
+thing. It might be many things, complex structure but in
+retrieving/writing we think of it as one thing.
+
+In RDBMS, we have to splat it out across tables. 
+
+KV pair, Value == aggregate, Document DB document == aggregate
+
+** Column family databases
+
+More complicated but it is still an aggregate-oriented database. 
+
+Row key, storing multiple column families. The column family is your
+aggretate - address by row key and family name.
+
+** Benefits
+
+You can put the aggreggate in in one go. The database knows the
+boundaries of your aggregate. 
+
+great for clustering, you can put different aggregates on different
+nodes. Only one node to pick up the data. 
+
+Makes running on clusters efficiently way more straightforward
+
+** Nothing is perfect
+
+What if you want to look at db in different ways- aggregating by
+product.
+
+We want to change the aggregation structure to have a different root -
+product, not order.
+
+In RDBMS it is straightfoward. But PITA with aggregate oriented.
+
+Map reduce job to rearrange the data. Cached but always more
+complicated.
+
+Useful except if you want to slice and dice your data in different
+ways.
+
+** Graph Databases
+
+completely different
+
+Nodes and arcs
+
+Nice thing about storing graph - moving across relationships between
+them.
+
+You might think relational databases would with word relationahl, but
+acutally relational referrs to set theory constructs.
+
+Graphs make it easy to do and faster.
+
+Can have an interesting query language to ask questions of
+graphs. Graph oriented queries. Things that would be difficult to
+write and unperformant in sql.
+
+** Gone in different directions
+
+Graph dbs break things down into smaller parts
+
+AO databases lump them together. Can still map relationships but it is
+messy.
+
+The question is, how do you work with your data?
+
+** All of these are schemaless
+
+(Aside from implicit schemas)
+
+** NoSQL and consistency
+
+Heard something like this: RDBMS == ACID NoSQL == BASE. Contrived and
+meaningless acronym.
+
+Boils down to, if you have single unit of info spread among diff
+tables, you don't want to have written half data before
+failure. Effectively give you atomic updates.
+
+Graph databases tend to follow ACID updates. They decompose the data
+so much so have even more of a need to do that.
+
+AO databases actually dont need transactions as much as aggregate is
+bigger. Aggregates are transaction boundaries, shouldn't cross the
+boundaries.
+
+This is effecitively what you do with AO dbs. Any update to an
+aggregate going to be consistent atomic etc. Only when updating more
+than one doc at once - that is not as common as you think.
+
+** Write -write conflicts
+
+ACID to teh rescue, to prevent this we wrap the entire thing in a
+transaction. Makes sure that we dont get a conflict - one will be told
+that they need to retrieve the data again.
+ 
+Occasionally you get away with it but holding transaction open for
+that long, while user updates... you kill perofmrance. On low use
+system you could do this and avoid a whole bunch of problems.
+
+Instead usual advice to wrap transaction around the update. Might end
+up one update overrights the other one.
+
+How to solve this? Technique called 'offline lock'.
+
+Give each record a version stamp. When you post, you provide version
+stamp of where you read from - if posting an older version number you
+error. Can use resolution techniques.
+
+** Consistency - logical and replication
+
+logical as above.
+
+Replication problems when you start to spread stuff around.
+
+One technique is sharding - one piece of data on one machine, multiple
+machines.
+
+Another common technique with clusters - put same data in multiple
+nodes. Good for speed and resilience.
+
+As soon as you do replication, you get a new class of problem.
+
+Consistency vs availablility - do you let both of them book the hotel
+room? Business can figure it out- do they have emergency rooms
+anyyway? 
+
+Consistency vs Availability. This is always a domain choice. In the US
+you should always be able to shop!!!
+
+** Cap Theorem
+
+If you have network partition you have a choice of consistency or
+availability. That's where you have to make the choice.
+
+This isn't a single binary choice.
+
+Can trade off levels of consistency and availability. And it can vary
+by oepration.
+
+Most of the time you not trading off consistency vs availability. Most
+of the time you are trading consistnecy against response time. More
+you need consistency, more you need to trade off performance.
+
+Merging shopping carts is really quite simple.
+
+Really another part of safety/liveness tradeoff.
+
+** You have to think about consistency issues differently
+
+It's not just up to us as techies. It's the way the business want to
+work.
+
+* When and why
+
+When why you might want to use.
+
+Two drivers: large scale data. Reality is there is tons of data coming
+at us - the large scale data problem is only going to grow. Other
+driver is easier development. 
+
+eg. Guardian  - articles... natural aggregate. Spreading across rdbms
+is pain. If the data doesnt' fit with it.
+
+The impedence mismatch problem was supposed to be solved but
+integration via database killed it.
+
+But now more and more people seeing that integration via database
+bad. If you can effectively isolate database, you can start to do
+these things.
+
+Integration via database PITA anyyway.
+
+** Data warehousing
+
+Another reason is to do analytics.
+
+Trad data warehousing, waterfall crap.
+
+How do we grab the data to answer a question?
+
+Graph dbs allow you to do graph like analytics.
+
+Aggregate dbs not quite suited to slicing and dicing, but easy way to
+store data.
+
+** Is NoSQL the future? 
+
+The future is Polyglot Persistence.
+
+There will be room for lots and lots of different
+databases.... relational still play a big role. Within app/org you
+will use lots of different databases. Using the best tool for the job.
+
+** Opportunities -> Problems
+
+Have to think about this stuff, decide on most suitable. Relational
+DBAs not going to like them. NoSQL databases are immature compared to
+20 yers of RD. Eventual consistency.
+
+** What kind of product
+
+Rapid TT market, dataintesive
+
+Is it a strategic project? Then it's worth taking on the extra risk
+and unknowns. Utility project? Might not be the best place to bring in
+unknown - possibly best off with the familiar.
+
+

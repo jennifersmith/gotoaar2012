@@ -1,0 +1,291 @@
+* Etsy - continuous delivery, the dirty details.
+Mike Brittain
+
+How Etsy works - a lot of it is influenced by continuous
+deployment/delivery.
+
+Primary product is website (outside of their ios app)
+
+Started doing CD at beginning of 2009.
+
+Full deploys vs feature flags.
+
+Between 20 and 40 deploys a day now.
+
+At heart of what they are doing
+
++ Devops
++ Working on mainlines
++ Feature flags
++ Branching in code
+
+We work in PHP - please dont run out the doors!
+
+** Continuous deployment practice at etsy
+
+Deploy button.
+
+Everyone who can commit code has access to it. LDAP credentials.
+
+When you press it, it deploys all the code to the app servers. 
+
+Then (before end of 2009): Deployment army, highly orchestrated and
+infrequent.   6 hours to redeploy! Scheduled downtime, cache purging, schema
+
+Now (2010): 15 minutes, 1 person, rapid release cycle, site stays up
+
+Config flags <5 minutes
+
+In summary, old is slow complex special, new fast simple common
+
+First thing you do when you start at etsy.  your first job is to put
+your pic on the team page. A good induction.
+
+Second day is tax forms!!
+
+* Continuous deployment
+
+Continous changes, constantly incrementing, doing this repeatedly.
+
+"How do you build a feature so quickly?"
+
+We are notbuilding features that we release each day. Small
+incremental changes and additions.
+
+Software Deploy != Product launch
+
+We can organise a bunch of deploys into a  prodcut launch.
+
+* Deploys frequently gated by config flags
+
+"Dark releases"
+
+Try to do simplest thing possible. It's just an array in PHP. Less
+things to go wrong.
+
+Just using if blocks.
+
+Flags are not just binary - On is 100%, off is 0%. We can ramp up to a
+percentage of users... or just for specific users (like internal
+users)
+
+Deploying and validating in production. 
+
+* Whats in a deploy
+
+Small incremental changes, copy/content changes, graphics, new classes
+etc.
+
+* Quickly respond to issues
+
+Security, bugs, traffic, load shedding.
+
+Havng the mainline ready for deployment means we can have someoen put
+in a patch and deploy quickly. No preplanning required.
+
+Can turn off a feature cos the backend is getting thrashed
+
+Blur lines between operations and engineers. We (devs) involved with
+that.
+
+* Etsy favourites
+
+Simple config flag to switch it off. If favourites tool failing (as
+has), we can just turn it off and most users wouldnt know
+
+* CD config schema cahnges?
+
+Schema changes on a a thursday!
+
+Those changes are more expensive = hours or days? 
+
+Risk around them are harder.
+
+Move to lots of "are we doing right thing" convos - talk more outside
+the change.
+
+
+* Our web app is largely monolithic
+
+No services - much fewer external services.
+
+Tests really fast
+
+* Etys.com support tools, dev APIs, back office etc.
+
+Deploy stuff with shared libs at once???
+
+External services not deployed with the rest! - database, search,
+photo storage.
+
+* Config flags - backward and forward
+
+Config flag to use new vs old version of schema.
+
+Expose multiple version in each version 
+
+* Example : changing a db schema
+
+We prefer ADDs over ALTERs. ("non-breaking expansions")
+
+Altering in place requires coupling and code and schema changes! So
+expose two different versions
+
+eg.g merging tables "user" and "user_prefs"
+
+We didnt end up using user_prefs denormalisation
+
+0. Add new version to schema (write_to_user_prefs = on, write_to_usr=off)
+1. write to both versions (write_to_ussr=on)
+2.?
+3. Read from new version (read_fromuser = staff) and then gradually
+   ramp up
+
+We gradually ramp up and see if that is what we expect - monitoring,
+metrics, support calls, bug on the site.
+
+Then we get to 100% onto the new version
+
+4. Cut off writes to the new version
+
+Try to avoid many releases than involve logic changes - just do the
+first release with flags.
+
+
+* "Branch by abstraction"
+
+We put the code in the model.
+
+"The migration 4-step"
+
+* Going back and cleaning flags, codes columns
+
+Question of whether you need that code again? If you stopped using it,
+or code is complete mess or perf problem you gonna want to get rid of
+it.
+
+If old version is stable etc. then keeping it in place is a good exit
+strategy.
+
+* Archiitecture and proecess
+
+How does CD implementation affect upstream processes?
+
+We do fairly little planning
+
+We have high code visibility - teams are not siloed. High levels of
+communication.
+
+* Deploying is cheap
+
+Everyone can deploy. Deployment is cheap.
+
+* Philosophies
+
++ Gathering data should be cheap too: Staff, opt-in prototype, 1%
+  ... looking at features for interest and engagement before we put
+  good archi in
+
+FIRST ITERATION IS EXPERIMENT
+
+Dont need to worry about arch for 1%
+
++ Get into prod ASAP. our designers are comfy in the code. They can
+  stub a controller out just enough to prototype.
+
++ Architecture largely doesntmatter when talking about small
+  groups. We will take shortcuts, reach out to architect, senior
+  person as sanity check to make sure not cutting out from doing it
+  good the next time
+
++ Kill things that don't work. Get rid of code or features that dont
+  work. Supporting legacy feartures is boring and frustrating and
+  takes time away from engineers.  Frees you up from thinking about
+  making it perfect. Focussing on shipping quick.
+
++ YOUR ASSUMPTIONS WILL BE WRONG ONCE YOU'VE SCALED 10X. Trying not to
+  take selves to seriously. Don't hastily judge the people that build
+  the version before you
+
+"We don't optimize for eing right. We optmise for quickly detecting
+when we are wrong"
+
++ Be really good at changing your architecture.
+
+* Integration and operations
+
+Safety measures: code review before commit.
+
+Peers looking at code and make sure not doing dumb things. Always good
+to have someone knowign what you are about to deploy.
+
+Automated testing before you deploy.
+
+As much validation as possible in dev.
+
+** Why integrate with production?
+
+surely test run is enough ? 
+
+But dev is not same as production. If you think it is, then you will
+be suprised.
+
+Integration into production is a test in iteself. 
+
+** Some things you dont see
+
+7 years of odd user states, much much more prod traffic so hard to
+simulate.
+
+More bigger database servers.
+
+** Verify frequently in small batches.
+
+DEV IS NOT PROD
+
+We play the same recipes in prod. We keep in sync. but even so DEV IS
+NOT PROD!
+
+** We started with DEV->QA->Staging->Prod
+
+We would find stuff that was broken just as artifact of the staging env
+
+Dev -> PreProd -> Prod 
+
+PreProd touches same services. Sanity checking for new code.
+
+Trim the fat, make it first
+
+Test and integrate where you'll see value.
+
+We hvae a build stage for automated tests but no web inteface for
+clicking around.
+
+Config flags: off, on, staff, opt-in prototypes.
+
+** We run our autoamted tests after deploy.
+
+We hvae alerts when these fail.
+
+Realtime metrics and dashboards.
+
+(picture)
+
+
+Release Managers:0
+
+You are pushing the button yourself so you have to check the metrics.
+
+Outgoing bandwidth drop? Broken or just better?
+
+You write code, you release code and then you monitor it.
+
+Obverse, ovient decide act
+
+Suprises: page performance got better when we turned off
+translations. Lead us to a refactoring.
+
+
+
+
+

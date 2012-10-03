@@ -1,0 +1,110 @@
+* Fitting the model
+
+Why we chose a database to fit our data model rather than other way
+around.
+
+Soundcloud is youtube for sound.
+
+** Databases
+
+What was the most important lesson we learnt?
+
+Understand what your database does for you.
+
+As an industry we put our 'blinders of abstraction' - looking at your
+source code through your IDE, or looking at arch with boxes and
+arrows.
+
+Sometimes we forget limitations of physical world in the abstractions
+we use.
+
+** Mysql -> Cassandra (does it matter?)
+
+Limiting scope of talk to just persistence. You write it you read it,
+it doesnt go away.
+
+*** Spining disks
+
+These are our materials.
+
+"Use SSDs and everything will be OK". But that's not the point. You
+need to understand however your storage works whatever it is.
+
+"I'm in the cloud I dont need to worry about storage." Still based on
+the same materials.
+
+** The data
+
+Activity feed. The feed needs to be consistent - needs to be the same
+each time you view it. We wanted to save it once and just show it.
+
+Viewer->Comment , materialised concept of events.
+
+We wanted to precompute all of events so ready when they next log in.
+
+** As ERD
+
+Each node/rel has own table.
+
+There was some benefits, as any point we can go back and change the
+dashboard. Robust in face of changes to the algo.
+
+** Load time
+
+load times were getting bigger faster than users registered. Reading
+was slow
+
+*** WHY?
+
+Surrogate key - created an ordering. Sequential clock, database could
+yse to it's advantage.
+
+B+ tree index;
+
+On disk format was quite effective - was why we were gettting so many
+views
+
+What happened when add /update When keys were too large... split tree
+
+*** Seeks
+
+Whya re they important. 2 second  times.
+
+*** Storage
+
+Couldnt create event s on one host
+
+More storage, more gaps, more seqs
+
+** 10,000 ft view
+
+Really we didnt have archic problemn, we just thought it was a
+database problem. What it was was a disk problem.
+
+** Eventually Consistent
+
+Reads happen mostly a while after logging in.
+
+** Hot Writes
+
+stay in primary storage/buffer in ram.
+
+** Cold Reads
+
+Rendered from storage - no way could put int eveveron's detaials
+
+** Partitiond
+
+partitioned on view key
+
+** Kill it with fire
+where fire = hardware
+
+** Extract transform load
+
+Write to mameory = > magic => read from disk
+
+
+
+
+
