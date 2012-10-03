@@ -1,0 +1,146 @@
+* Typescript
+
+Customers keep telling us how hard it is to write large apps in
+javascript.
+
+Javascript was not designed to write large apps. 10 line event
+handlers intentionally...
+
+Static type information is what makes it easier to do code completion,
+navigation refactorings.
+
+Where do we go next with JS development tools? Thought would be neat
+to strenthen javascript with key concepts types modules etc. But not
+sacrifice what makes it interesting .
+
+TS language for application scale javascript development.
+
+Superset of javascript that compiles to plain javascript.
+
+Any browser. Any host. Any OS... the code it produces.
+
+Compiler and associated lang services all open source.
+
+** starts with js
+
+Valid JS is valid TS. Copy and paste. All JS libs work.
+
+** Adding on top
+
+Optional static types, classes and modules
+
+Missing things that power. Zero cost: Static types completely
+disappear runtime.
+
+** Ends with JS
+
+Compiles to JS
+
+** DEMO
+
+Google's closure lets you add types in comments.
+
+Type system in comments not conducive or expressive. Typescript allows
+you to put type annotations in your code.
+
+Add type hit to make errors in the code and to get type inference.
+
+Primitive types: string, number
+
+Trying to boil down to sematic subset of js that makes sense.
+
+Arrays
+
+Code completions. We can see names and signatures of methods.
+
+Can describe a 'shape of object'. Function takes object X that has an
+A and a B property.
+
+All of the javascript generated is same minus inteface/type
+declarations.
+
+Types flow through just a few annotations.
+
+Optional types with question mark.
+
+** Overloads
+
+Can specificy overloads on inteface.
+
+can group them togeter 
+foo {
+  (s: string): string;
+}
+
+etc.
+
+Can model all the crazy things that come into javascript with this.
+
+** Structural typing
+
+Mere fact of implementing the 'shape' then you have implemnetd the
+type, no need to declare
+
+** HTML dom 
+
+Generated from ITL files into typescript.
+
+Can see what their shapes are.
+
+The things that are really neat is that you can just apply it into
+your tool and the tooling 'lights up'
+
+Does the same for jquery and for node.js
+
+** Tyoe system
+
+*** Formalisation of javascript's types
+
+Not inventing a new one.
+
+*** Type inference/structural typing
+
+Dont need a lot of inference, they just 'flow' throught.
+
+*** Not "provably typesafe"
+
+... and it's optional. Geared around letting tooling help you.
+
+** Classes
+
+Instances go on the this, functions on the prototype. This is how
+ecma6 gonna be anyway.
+
+Generates constructor inline when it is called.
+
+Define arguments as public on constructor params
+
+*** Default arg values
+
+*** Extends
+
+inheritence.
+
+Impl is injected into the output file. That is about the only time
+code is injected in. And only if you use extends. No other libs.
+
+*** Arrows/lambdas
+
+Arrow notation. Lexically scoped. 
+
+var _this = this
+
+*** Modules
+
+can declare scoped modules.
+
+Can also do import.
+
+*** Reference paths
+Done by comments - also include that other file in compilation
+
+*** Supports popular module loading
+
+ComonJS and AMO modelling
+
+*** Demo apps
